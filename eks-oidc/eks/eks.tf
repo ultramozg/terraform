@@ -149,3 +149,23 @@ module "eks_auth" {
     module.eks
   ]
 }
+
+/*
+data "tls_certificate" "cluster" {
+  url = module.eks.cluster_oidc_issuer_url
+
+  depends_on = [
+    module.eks
+  ]
+}
+
+resource "aws_iam_openid_connect_provider" "cluster" {
+  client_id_list = ["sts.amazonaws.com"]
+  thumbprint_list = concat([data.tls_certificate.cluster.certificates.0.sha1_fingerprint], module.eks.cluster_certificate_authority_data)
+  url = module.eks.cluster_oidc_issuer_url
+
+  depends_on = [
+    module.eks
+  ]
+}
+*/
