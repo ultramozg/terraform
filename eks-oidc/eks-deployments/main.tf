@@ -1,10 +1,3 @@
-data "terraform_remote_state" "eks" {
-  backend = "local"
-
-  config = {
-    path = "../eks-infra/terraform.tfstate"
-  }
-}
 
 /*
 module "eks_auth" {
