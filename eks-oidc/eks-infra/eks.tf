@@ -133,23 +133,6 @@ module "eks" {
   tags = local.tags
 }
 
-module "eks_auth" {
-  source = "aidanmelen/eks-auth/aws"
-  eks    = module.eks
-
-  map_roles = [
-    {
-      rolearn  = "arn:aws:iam::516478179338:role/admin-eks-role"
-      username = "admins"
-      groups   = ["system:masters"]
-    }
-  ]
-
-  depends_on = [
-    module.eks
-  ]
-}
-
 /*
 data "tls_certificate" "cluster" {
   url = module.eks.cluster_oidc_issuer_url
