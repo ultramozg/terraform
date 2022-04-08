@@ -1,3 +1,3 @@
-output "eks" {
-  value = module.eks
+output "eks_cluster_id" {
+  value = module.eks.cluster_id
 }
