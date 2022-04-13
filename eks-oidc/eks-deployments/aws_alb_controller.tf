@@ -17,13 +17,40 @@ resource "aws_iam_policy" "AWSLoadBalancerControllerIAMPolicy" {
 
 }
 
+/*
+This is fix to the this issue https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/1171
+*/
+data "http" "worker_policy" {
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/iam-policy.json"
+
+  request_headers = {
+    Accept = "application/json"
+  }
+}
+
+resource "aws_iam_policy" "AWSALBWpolicy" {
+  name        = "AWSLoadBalancerControllerFixPolicy"
+  path        = "/"
+  description = "AWS Load Balancer Controller Policy"
+
+
+  policy = data.http.worker_policy.body
+
+  tags = {
+    Terraform   = "true"
+  }
+
+}
+
+/* END */
+
 module "iam_assumable_role_aws_lb" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "3.6.0"
   create_role                   = true
   role_name                     = "AWSLoadBalancerControllerIAMRole"
   provider_url                  = replace(data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = [aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn]
+  role_policy_arns              = [aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn, aws_iam_policy.AWSALBWpolicy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_aws_lb_service_account_namespace}:${local.k8s_aws_lb_service_account_name}"]
 
   tags = {
@@ -41,7 +68,7 @@ resource "helm_release" "alb-controller" {
 
   set {
     name  = "clusterName"
-    value = "ex-eks-infra"
+    value = data.terraform_remote_state.eks.outputs.eks_cluster_name
   }
 
   set {
