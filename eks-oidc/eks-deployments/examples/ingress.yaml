@@ -8,13 +8,11 @@ metadata:
     alb.ingress.kubernetes.io/load-balancer-name: ingress-internal-lb
     # Ingress Core Settings
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/ip-address-type: dualstack
     alb.ingress.kubernetes.io/target-type: ip
     # Creates External Application Load Balancer
-    #alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/scheme: internet-facing
     # Creates Internal Application Load Balancer
     #alb.ingress.kubernetes.io/scheme: internal 
-    alb.ingress.kubernetes.io/scheme: internet-facing
     # Health Check Settings
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
