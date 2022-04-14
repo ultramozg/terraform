@@ -46,20 +46,6 @@ module "iam_assumable_role_aws_lb" {
 
 }
 
-resource "kubernetes_service_account" "aws_alb" {
-  metadata {
-    name = local.k8s_aws_lb_service_account_name
-    namespace = "kube-system"
-
-    annotations = {
-      "serviceAccount.annotations.eks.amazonaws.com/role-arn" = module.iam_assumable_role_aws_lb.this_iam_role_arn 
-    }
-  }
-}
-
-
-/* We should create a serviceaccount */
-
 resource "helm_release" "alb-controller" {
   name       = "alb-controller"
   repository = "https://aws.github.io/eks-charts"
@@ -73,23 +59,12 @@ resource "helm_release" "alb-controller" {
   }
 
   set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
     name  = "serviceAccount.name"
     value = local.k8s_aws_lb_service_account_name
   }
 
-  /*
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.iam_assumable_role_aws_lb.this_iam_role_arn
   }
-  */
-
-  depends_on = [
-    kubernetes_service_account.aws_alb 
-  ]
 }
