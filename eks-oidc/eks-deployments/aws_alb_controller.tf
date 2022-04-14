@@ -8,41 +8,28 @@ resource "aws_iam_policy" "AWSLoadBalancerControllerIAMPolicy" {
   path        = "/"
   description = "AWS Load Balancer Controller Policy"
 
-
-  policy = file("policies/iam-policy.json")
+  # This policy was being taken from the official documentation
+  # https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
+  policy = file("policies/iam-alb-controller-policy.json")
 
   tags = {
     Terraform   = "true"
   }
-
 }
 
-/*
-This is fix to the this issue https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/1171
-*/
-data "http" "worker_policy" {
-  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/iam-policy.json"
-
-  request_headers = {
-    Accept = "application/json"
-  }
-}
-
-resource "aws_iam_policy" "AWSALBWpolicy" {
-  name        = "AWSLoadBalancerControllerFixPolicy"
+resource "aws_iam_policy" "AWSLoadBalancerControllerIngressIAMPolicy" {
+  name        = "AWSLoadBalancerControllerIngressIAMPolicy"
   path        = "/"
-  description = "AWS Load Balancer Controller Policy"
+  description = "AWS Load Balancer Controller Ingress Policy"
 
-
-  policy = data.http.worker_policy.body
+  # This policy is the fix for the ingress
+  # https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/1171#issuecomment-714724443
+  policy = file("policies/iam-alb-ingress-policy.json")
 
   tags = {
     Terraform   = "true"
   }
-
 }
-
-/* END */
 
 module "iam_assumable_role_aws_lb" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
@@ -50,7 +37,7 @@ module "iam_assumable_role_aws_lb" {
   create_role                   = true
   role_name                     = "AWSLoadBalancerControllerIAMRole"
   provider_url                  = replace(data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = [aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn, aws_iam_policy.AWSALBWpolicy.arn]
+  role_policy_arns              = [aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn, aws_iam_policy.AWSLoadBalancerControllerIngressIAMPolicy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_aws_lb_service_account_namespace}:${local.k8s_aws_lb_service_account_name}"]
 
   tags = {
@@ -58,6 +45,20 @@ module "iam_assumable_role_aws_lb" {
   }
 
 }
+
+resource "kubernetes_service_account" "aws_alb" {
+  metadata {
+    name = local.k8s_aws_lb_service_account_name
+    namespace = "kube-system"
+
+    annotations = {
+      "serviceAccount.annotations.eks.amazonaws.com/role-arn" = module.iam_assumable_role_aws_lb.this_iam_role_arn 
+    }
+  }
+}
+
+
+/* We should create a serviceaccount */
 
 resource "helm_release" "alb-controller" {
   name       = "alb-controller"
@@ -72,7 +73,23 @@ resource "helm_release" "alb-controller" {
   }
 
   set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = local.k8s_aws_lb_service_account_name
+  }
+
+  /*
+  set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.iam_assumable_role_aws_lb.this_iam_role_arn
   }
+  */
+
+  depends_on = [
+    kubernetes_service_account.aws_alb 
+  ]
 }
