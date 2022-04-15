@@ -12,11 +12,13 @@ variable "map_roles" {
     groups   = list(string)
   }))
   default = [
+    /*
     {
       rolearn  = "arn:aws:iam::516478179338:role/admin-eks-role"
       username = "admins"
       groups   = ["system:masters"]
     }
+    */
   ]
 }
 
@@ -28,4 +30,8 @@ variable "map_users" {
     groups   = list(string)
   }))
   default = []
+}
+
+variable "aws_auth_configmap_yaml" {
+  type = string
 }

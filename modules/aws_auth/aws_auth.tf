@@ -1,6 +1,6 @@
 locals {
   merged_map_roles = distinct(concat(
-    try(yamldecode(yamldecode(data.terraform_remote_state.eks.outputs.eks_aws_auth_configmap).data.mapRoles), []),
+    try(yamldecode(yamldecode(var.aws_auth_configmap_yaml).data.mapRoles), []),
     var.map_roles,
   ))
 
