@@ -12,7 +12,11 @@ metadata:
     # Creates External Application Load Balancer
     alb.ingress.kubernetes.io/scheme: internet-facing
     # Creates Internal Application Load Balancer
-    #alb.ingress.kubernetes.io/scheme: internal 
+    # alb.ingress.kubernetes.io/scheme: internal 
+    # Share load Balancer between applications add group.name
+    alb.ingress.kubernetes.io/group.name: my-group
+    # The number can be 1-1000. The lowest number for all ingresses in the same ingress group is evaluated first. 
+    alb.ingress.kubernetes.io/group.order: '10'
     # Health Check Settings
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
