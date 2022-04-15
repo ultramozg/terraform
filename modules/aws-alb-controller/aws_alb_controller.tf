@@ -10,7 +10,7 @@ resource "aws_iam_policy" "AWSLoadBalancerControllerIAMPolicy" {
 
   # This policy was being taken from the official documentation
   # https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
-  policy = file("policies/iam-alb-controller-policy.json")
+  policy = file("${path.module}/policies/iam-alb-controller-policy.json")
 
   tags = {
     Terraform   = "true"
@@ -22,7 +22,7 @@ module "iam_assumable_role_aws_lb" {
   version                       = "3.6.0"
   create_role                   = true
   role_name                     = "AWSLoadBalancerControllerIAMRole"
-  provider_url                  = replace(data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url, "https://", "")
+  provider_url                  = replace(var.provider_url, "https://", "")
   role_policy_arns              = [aws_iam_policy.AWSLoadBalancerControllerIAMPolicy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_aws_lb_service_account_namespace}:${local.k8s_aws_lb_service_account_name}"]
 
@@ -36,12 +36,13 @@ resource "helm_release" "alb-controller" {
   name       = "alb-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
+  version    = var.chart_version
 
   namespace = "kube-system"
 
   set {
     name  = "clusterName"
-    value = data.terraform_remote_state.eks.outputs.eks_cluster_name
+    value = var.cluster_name
   }
 
   set {
