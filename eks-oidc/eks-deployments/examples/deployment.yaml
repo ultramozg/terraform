@@ -5,7 +5,7 @@ metadata:
   labels:
     app: app3-nginx 
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: app3-nginx
@@ -21,7 +21,7 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: "4G"
+              memory: "2G"
               cpu: "250m"
 ---
 apiVersion: v1
