@@ -41,7 +41,12 @@ module "helms" {
       chart         = "metrics-server"
       repository    = "https://charts.bitnami.com/bitnami"
 
-      sets = []
+      sets = [
+        {
+          name  = "apiService.create"
+          value = "true"
+        }
+      ]
     }
   }
 }
