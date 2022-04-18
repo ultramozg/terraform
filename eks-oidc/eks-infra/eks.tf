@@ -81,6 +81,14 @@ module "eks" {
       source_cluster_security_group = true
       description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
     }
+    metrics_servier_allow_from_control_plane = {
+      type                          = "ingress"
+      protocol                      = "tcp"
+      from_port                     = 8443
+      to_port                       = 8443
+      source_cluster_security_group = true
+      description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+    }
     ingress_self_all = {
       description = "Node to node all ports/protocols"
       protocol    = "-1"
@@ -118,7 +126,8 @@ module "eks" {
     green = {
       min_size     = 1
       max_size     = 2
-      desired_size = 1
+      # Comment out this should be handled by the cluster autoscaler
+      #desired_size = 1
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
