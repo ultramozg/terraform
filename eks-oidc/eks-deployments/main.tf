@@ -36,15 +36,19 @@ module "helms" {
 
   helms = {
     metrics-server = {
-      chart_version = "5.11.7"
+      chart_version = "3.8.2"
       namespace     = "kube-system"
       chart         = "metrics-server"
-      repository    = "https://charts.bitnami.com/bitnami"
+      repository    = "https://kubernetes-sigs.github.io/metrics-server/"
 
       sets = [
         {
           name  = "apiService.create"
           value = "true"
+        },
+        {
+          name  = "containerPort"
+          value = 8443
         }
       ]
     }
