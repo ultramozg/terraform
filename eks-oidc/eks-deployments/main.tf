@@ -19,3 +19,34 @@ module "alb-controller" {
   provider_url = data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url
   chart_version      = "1.4.1"
 }
+
+module "helms" {
+  source = "../../modules/helms"
+
+  helms = {
+    cluster-autoscaller = {
+      chart_version = "9.17.0"
+      namespace     = "kube-system"
+      chart         = "cluster-autoscaler"
+      repository    = "https://kubernetes.github.io/autoscaler"
+
+      sets = [
+        {
+          name  = "autoDiscovery.clusterName"
+          value = data.terraform_remote_state.eks.outputs.eks_cluster_name
+        },
+        {
+          name  = "awsRegion"
+          value = "eu-west-1"
+        }
+      ]
+    }
+
+    metrics-server = {
+      chart_version = "9.17.0"
+      namespace     = "kube-system"
+      chart         = "cluster-autoscaler"
+      repository    = "https://charts.bitnami.com/bitnami"
+    }
+  }
+}
