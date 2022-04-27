@@ -150,3 +150,7 @@ module "eks" {
 
   tags = local.tags
 }
+
+module "bastion" {
+  source = "../../modules/bastion"
+}

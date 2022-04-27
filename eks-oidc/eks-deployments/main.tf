@@ -8,6 +8,11 @@ module "aws_auth" {
       rolearn  = "arn:aws:iam::516478179338:role/admin-eks-role"
       username = "admins"
       groups   = ["system:masters"]
+    },
+    {
+      rolearn  = data.terraform_remote_state.eks.outputs.eks_management_role_arn
+      username = "admins"
+      groups   = ["system:masters"]
     }
   ]
 }

@@ -21,3 +21,7 @@ value = module.eks.cluster_oidc_issuer_url
 output "cluster_identity_oidc_issuer_arn" {
   value = module.eks.oidc_provider_arn
 }
+
+output "eks_management_role_arn" {
+  value = module.bastion.eks_management_role_arn
+}
