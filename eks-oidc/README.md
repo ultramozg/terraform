@@ -40,4 +40,8 @@ aws eks update-kubeconfig --region eu-west-1 --name ex-eks --role-arn "arn:aws:i
 
 
 ##### Notice 
-This example also brings up a "Bastion" host with attached role to manage EKS cluster
+This example also brings up a "Bastion" host with attached role to manage EKS cluster, so to connect to the cluster you need to ssh in and launch this command
+
+```bash
+aws eks update-kubeconfig --region eu-west-1 --name ex-eks-infra
+```
