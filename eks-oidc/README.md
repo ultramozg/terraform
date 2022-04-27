@@ -37,3 +37,7 @@ aws eks update-kubeconfig --region eu-west-1 --name ex-eks --role-arn "arn:aws:i
     ]
 }
 ```
+
+
+##### Notice 
+This example also brings up a "Bastion" host with attached role to manage EKS cluster
