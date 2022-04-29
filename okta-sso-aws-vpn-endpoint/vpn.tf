@@ -1,33 +1,8 @@
-resource "tls_private_key" "example" {
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "example" {
-  private_key_pem = tls_private_key.example.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "crl_signing",
-    "cert_signing",
-  ]
-}
-
-resource "aws_acm_certificate" "cert" {
-  private_key      = tls_private_key.example.private_key_pem
-  certificate_body = tls_self_signed_cert.example.cert_pem
-}
-
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Client VPN example"
   client_cidr_block = "10.20.0.0/22"
   split_tunnel = true
-  server_certificate_arn = aws_acm_certificate.cert.arn
+  server_certificate_arn = "arn:aws:acm:eu-west-1:516478179338:certificate/43460ed1-1c7f-4392-9ecf-73c34ee7f3bd"
 
   authentication_options {
     type = "federated-authentication"
