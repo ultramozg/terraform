@@ -13,9 +13,8 @@ resource "tls_self_signed_cert" "example" {
   validity_period_hours = 12
 
   allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
+    "crl_signing",
+    "cert_signing",
   ]
 }
 
