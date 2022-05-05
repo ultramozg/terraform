@@ -2,7 +2,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
     name  = "my-cluster"
 }
 
-
 resource "aws_ecs_task_definition" "service" {
   family = "worker"
   container_definitions = jsonencode([
