@@ -24,7 +24,8 @@ resource "aws_launch_configuration" "ecs_launch_config" {
     security_groups      = [aws_security_group.ecs_sg.id]
     //associate_public_ip_address = true
     //key_name             = aws_key_pair.mykeypair.key_name
-    instance_type        = "t3.small"
+    instance_type        = "t3.medium"
+    spot_price           = "0.017" //https://aws.amazon.com/ec2/spot/pricing/
     user_data            = file("scripts/init.sh")
 }
 
