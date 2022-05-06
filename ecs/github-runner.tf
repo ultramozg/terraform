@@ -18,7 +18,7 @@ resource "aws_ecs_task_definition" "service" {
         },
         {
           name  = "ACCESS_TOKEN"
-          value = "PAT_TOKEN"
+          value = "<PAT_TOKEN>"
         },
         {
           name  = "RUNNER_WORKDIR"
