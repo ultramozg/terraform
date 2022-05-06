@@ -5,7 +5,7 @@ resource "aws_ecs_task_definition" "service" {
       name      = "runner"
       image     = "myoung34/github-runner"
       cpu       = 0
-      memory    = 64
+      memory    = 1024
       essential = true
       environment = [
         {
